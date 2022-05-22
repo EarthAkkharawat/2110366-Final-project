@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- <link rel="stylesheet" href="style.css" /> -->
+    <link rel="icon" href="lightbub.png" />
+
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smartest Light</title>
+  </head>
+
+  <style>
+    body {
+      font-family: "Inter";
+      /* font-style: italic; */
+      color: rgb(255, 255, 255);
+      /* background-color: #ceedce; */
+      background-color: #000000;
+      /* height: 100vh; */
+    }
+    .about {
+      /* display: flex; */
+      /* margin: auto;
+      align-items: center;
+      justify-content: center; */
+
+      margin: auto;
+      width: 50%;
+      padding: 10px;
+    }
+    .name {
+      text-align: center;
+      font-size: 30px;
+    }
+    .about {
+      /* text-align: center; */
+      border: 3px solid rgb(255, 113, 113);
+      padding: 2rem;
+      padding-top: 0.5rem;
+      /* margin-top: 0.2rem; */
+    }
+    #list {
+      font-size: 20px;
+    }
+    .dot {
+      height: 100px;
+      width: 100px;
+      background-color: rgb(102, 238, 120);
+      border-radius: 50%;
+      display: inline-block;
+      justify-content: center;
+      text-align: center;
+      align-items: center;
+      padding: 2rem;
+    }
+    .dotready {
+      height: 100px;
+      width: 100px;
+      background-color: rgb(255, 238, 0);
+      border-radius: 50%;
+      display: inline-block;
+      justify-content: center;
+      text-align: center;
+      align-items: center;
+      padding: 2rem;
+      margin-top: 2rem;
+
+    }
+    .main-func {
+      /* display: inline-block; */
+      min-width: fit-content;
+      min-height: fit-content;
+    }
+    .Lightbulb {
+      font-size: 12.5px;
+      border: 3px solid rgb(255, 113, 113);
+      padding: 2rem;
+      display: inline-block;
+      justify-content: center;
+      /* min-width: fit-content; */
+      width: 30%;
+      margin-top: 4rem;
+      margin-left: 4rem;
+      text-align: center;
+    }
+    .sensor {
+      font-size: 12.5px;
+      border: 3px solid rgb(255, 113, 113);
+      padding: 2rem;
+      display: inline-block;
+      justify-content: center;
+      min-width: fit-content;
+      max-width: fit-content;
+      margin-top: 10rem;
+      margin-left: 4rem;
+      text-align: center;
+    }
+  </style>
+
+  <body>
+    <div class="name">
+      <h1>Smartest Light</h1>
+    </div>
+    <div class="about">
+      <h2>How to use (manual mode)</h2>
+      <ul id="list">
+        <li>
+          You can turn on/off the light via the button located on the right.
+        </li>
+        <li>
+          If it's not dark yet, the lights will not turn on. Even if you press
+          the button or not.
+        </li>
+        <li>If it's not bright, you can turn off the lights.</li>
+      </ul>
+    </div>
+
+    <div class="main-func">
+      <div class="Lightbulb">
+        <span align="center" class="dot"></span>
+        <h2>Status of the light bulb (Green = ON/Gray = OFF)</h2>
+        <span align="center" class="dotready"></span>
+        <h2>
+          Status of the light bulb ready to turn on (Yellow = ready/Gray = not
+          ready)
+        </h2>
+      </div>
+
+      <div class="sensor">
+        <h2>brightness</h2>
+      </div>
+    </div>
+  </body>
+</html>
