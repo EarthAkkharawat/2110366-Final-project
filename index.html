@@ -68,9 +68,12 @@
 
     }
     .main-func {
-      /* display: inline-block; */
+      display: inline-block;
       min-width: fit-content;
       min-height: fit-content;
+      margin-top: 4rem;
+
+      /* align-items: top; */
     }
     .Lightbulb {
       font-size: 12.5px;
@@ -80,21 +83,34 @@
       justify-content: center;
       /* min-width: fit-content; */
       width: 30%;
-      margin-top: 4rem;
+      /* margin-top: 4rem; */
       margin-left: 4rem;
       text-align: center;
+      vertical-align: top;
+
     }
-    .sensor {
+    .brightness-sensor {
       font-size: 12.5px;
       border: 3px solid rgb(255, 113, 113);
       padding: 2rem;
       display: inline-block;
       justify-content: center;
-      min-width: fit-content;
-      max-width: fit-content;
-      margin-top: 10rem;
+      width: 30%;
+      /* margin-top: 10rem; */
       margin-left: 4rem;
       text-align: center;
+      align-items: center;
+      vertical-align: top;
+    }
+    .brightness {
+      /* font-size: 12.5px; */
+      border: 3px solid rgb(250, 180, 51);
+      padding: 1rem;
+      /* display: inline-block; */
+      /* justify-content: center; */
+      /* width: 30%; */
+      /* text-align: center; */
+      /* padding: auto; */
     }
   </style>
 
@@ -127,8 +143,9 @@
         </h2>
       </div>
 
-      <div class="sensor">
-        <h2>brightness</h2>
+      <div class="brightness-sensor">
+        <h2 class = "brightness">brightness</h2>
+        <h2 class = "brightness-desc">The brightness measured by the sensor</h2>
       </div>
     </div>
   </body>
