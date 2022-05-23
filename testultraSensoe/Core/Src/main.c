@@ -166,8 +166,8 @@ int main(void)
 	  HCSR04_Read();
 	  char x[20];
 	  int y1 = (distance/100) + 48;
-	  int y2 = ((distance/10)%10) +48 ;
-	  int y3 = (distance%10)+48 ;
+//	  int y2 = ((distance/10)%10) +48 ;
+//	  int y3 = (distance%10)+48 ;
 	  sprintf(x,"%d\r\n",y1);
 	  HAL_UART_Transmit(&huart2, x, strlen(x), 100000);
 //	  sprintf(x,"%d\r\n",y2);
