@@ -103,10 +103,10 @@ void loop() {
             // Display the HTML web page
             //**********************************************************************************************************************************************
             client.println("<!DOCTYPE html><html>");
-            client.println("<head><meta name = \"viewport\" content = \"width=device - width, initial - scale = 1\">");
+            client.println("<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" /> ");
+            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /");
             client.println("<link rel = \"icon\" href = \"image/lightbub.png\"/>");
-            client.println("< meta charset = \"UTF-8\" / > ");
-            client.println("< meta http - equiv = \"X - UA - Compatible\" content = \"IE = edge\"/> ");
+            client.println("<meta charset = \"UTF-8\"/> ");
             client.println("<title>Smartest Light</title >");
             client.println("<style>html {font-family: \"Inter\"; color: rgb(255, 255, 255); background-color: #000000;}");
             client.println(".about {margin: auto;width: 50%;padding: 10px;}");
@@ -125,7 +125,7 @@ void loop() {
             client.println("#on-off{cursor: pointer;background-color: #000000;}</style></head>");
             client.println("<body><div class=\"name\"><h1>Smartest Light</h1></div>");
             client.println("<div class=\"about\"><h2>How to use (manual mode)</h2>");
-            client.println("<body><div class=\"name\"><h1>Smartest Light</h1></div><ul id=\"list\"><li>You can turn on/off the light via the button located on the right.</li><li>If it's not dark yet, the lights will not turn on. Even if you pressthe button or not.</li><li>If it's not bright, you can turn off the lights.</li></ul></div>");
+            client.println("<ul id=\"list\"><li>You can turn on/off the light via the button located on the right.</li><li>If it's not dark yet, the lights will not turn on. Even if you pressthe button or not.</li><li>If it's not bright, you can turn off the lights.</li></ul></div>");
             client.println("<div class=\"main-func\">");
             client.println("<div class=\"Lightbulb\"><span align=\"center\" class=\"dot\"></span><h2>Status of the light bulb (Green = ON/Gray = OFF)</h2><span align=\"center\" class=\"dotready\"></span><h2>Status of the light bulb ready to turn on (Yellow = ready/Gray = not ready)</h2></div><div class=\"brightness-sensor\"><h2 class=\"brightness\">brightness</h2><h2 class=\"brightness-desc\">The brightness measured by the sensor</h2></div>");
             client.println("<div class=\"motion-sensor\"><h2 class=\"motion\">motion</h2><h2 class=\"motion-desc\">Status of the motion (Blue = detect motion/ Gray = no movement)</h2></div>");
