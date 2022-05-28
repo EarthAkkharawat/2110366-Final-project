@@ -24,7 +24,6 @@ const char* password = "Jafe1846";
 /* 3. Define the RTDB URL */
 #define DATABASE_URL "smartest-light-default-rtdb.firebaseio.com"
 
-" //<databaseName>.firebaseio.com or <databaseName>.<region>.firebasedatabase.app
 
 /* 4. Define the user Email and password that alreadey registerd or added in your project */
 #define USER_EMAIL "akkharawatbct@gmail.com"
@@ -38,7 +37,7 @@ FirebaseConfig config;
 
 
 // Set web server port number to 80
-//WiFiServer server(80);
+WiFiServer server(80);
 
 // Variable to store the HTTP request
 String header;
@@ -76,7 +75,7 @@ void setup() {
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-//  server.begin();
+  server.begin();
   Serial.println();
 
   Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
