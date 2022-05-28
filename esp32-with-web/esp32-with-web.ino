@@ -1,12 +1,44 @@
-// Load Wi-Fi library
+
+#if defined(ESP32)
 #include <WiFi.h>
+#include <FirebaseESP32.h>
+#elif defined(ESP8266)
+#include <ESP8266WiFi.h>
+#include <FirebaseESP8266.h>
+#endif
+
+// Provide the token generation process info.
+#include <addons/TokenHelper.h>
+
+// Provide the RTDB payload printing info and other helper functions.
+#include <addons/RTDBHelper.h>
 
 // Replace with your network credentials
 const char* ssid = "jade_Internet";
 const char* password = "Jafe1846";
 
+
+/* 2. Define the API Key */
+#define API_KEY "AIzaSyDU3ZLPqguNfSx2TBqNUsPZnsruVY_H3tQ"
+//AIzaSyDU3ZLPqguNfSx2TBqNUsPZnsruVY_H3tQ
+/* 3. Define the RTDB URL */
+#define DATABASE_URL "smartest-light-default-rtdb.firebaseio.com"
+
+" //<databaseName>.firebaseio.com or <databaseName>.<region>.firebasedatabase.app
+
+/* 4. Define the user Email and password that alreadey registerd or added in your project */
+#define USER_EMAIL "akkharawatbct@gmail.com"
+#define USER_PASSWORD "earth77"
+
+// Define Firebase Data object
+FirebaseData fbdo;
+
+FirebaseAuth auth;
+FirebaseConfig config;
+
+
 // Set web server port number to 80
-WiFiServer server(80);
+//WiFiServer server(80);
 
 // Variable to store the HTTP request
 String header;
@@ -44,7 +76,18 @@ void setup() {
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-  server.begin();
+//  server.begin();
+  Serial.println();
+
+  Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+
+
+  Firebase.begin(&config, &auth);
+
+  // Comment or pass false value when WiFi reconnection will control by your code or third party library
+  Firebase.reconnectWiFi(true);
+
+  Firebase.setDoubleDigits(5);
 }
 
 void loop() {
@@ -74,6 +117,7 @@ void loop() {
 
             // turns the GPIOs on and off
             if (header.indexOf("GET /on") >= 0) {
+              // if (value from light sensor > xxx) {
               Serial.println("LED on");
               outputState = "on";
               //digitalWrite(output26, HIGH); send signal to STM32 to toggle LED high
