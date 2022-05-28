@@ -17,8 +17,8 @@ WiFiServer server(80);
 String header;
 
 // Auxiliar variables to store the current output state
-String output26State = "off";
-String output27State = "off";
+String outputState = "off";
+//String output27State = "off";
 
 // Assign output variables to GPIO pins
 const int output26 = 26;
@@ -82,23 +82,14 @@ void loop() {
             client.println();
 
             // turns the GPIOs on and off
-//            if (header.indexOf("GET /26/on") >= 0) {
-//              Serial.println("GPIO 26 on");
-//              output26State = "on";
-//              digitalWrite(output26, HIGH);
-//            } else if (header.indexOf("GET /26/off") >= 0) {
-//              Serial.println("GPIO 26 off");
-//              output26State = "off";
-//              digitalWrite(output26, LOW);
-//            } else if (header.indexOf("GET /27/on") >= 0) {
-//              Serial.println("GPIO 27 on");
-//              output27State = "on";
-//              digitalWrite(output27, HIGH);
-//            } else if (header.indexOf("GET /27/off") >= 0) {
-//              Serial.println("GPIO 27 off");
-//              output27State = "off";
-//              digitalWrite(output27, LOW);
-//            }
+            if (header.indexOf("GET /on") >= 0) {
+              Serial.println("LED on");
+              outputState = "on";
+              //digitalWrite(output26, HIGH); send signal to STM32 to toggle LED high
+            } else if (header.indexOf("GET /off") >= 0) {
+              Serial.println("LED off");
+              outputState = "off";
+              //digitalWrite(output26, LOW); send signal to STM32 to toggle LED low      
 
             // Display the HTML web page **********************************************************************************************************************************************
             client.println("<!DOCTYPE html><html>");
@@ -121,7 +112,8 @@ void loop() {
 //            client.println(".motion-sensor {font-size: 12.5px;border: 3px solid rgb(255, 113, 113);padding: 2rem;display: inline-block;justify-content: center;width: 20rem;margin-left: 4rem;text-align: center;align-items: center;vertical-align: top;}");
             client.println(".motion {border: 3px solid rgb(250, 180, 51);padding: 1rem;}");
             client.println(".bbutton {display: inline-block;margin-left: 4rem;vertical-align: top;}");
-            client.println("#on-off{cursor: pointer;border: none;font-size: 40px;color: rgb(0, 0, 0); background-color: rgb(255, 230, 2);padding: 50px 50px; }</style></head>");
+            client.println("#on{cursor: pointer;border: none;font-size: 40px;color: rgb(0, 0, 0); background-color: rgb(255, 230, 2);padding: 50px 50px; }</style></head>");
+            client.println("#off{cursor: pointer;border: none;font-size: 40px;color: rgb(0, 0, 0); background-color: rgb(175, 174, 168);padding: 50px 50px; }</style></head>");
             client.println("<body><div class=\"name\"><h1>Smartest Light</h1></div>");
             client.println("<div class=\"about\"><h2>How to use (manual mode)</h2>");
             client.println("<ul id=\"list\"><li>You can turn on/off the light via the button located on the right.</li><li>If it's not dark yet, the lights will not turn on. Even if you pressthe button or not.</li><li>If it's not bright, you can turn off the lights.</li></ul></div>");
@@ -129,7 +121,18 @@ void loop() {
 //            client.println("<div class=\"Lightbulb\"><span align=\"center\" class=\"dot\"></span><h2>Status of the light bulb (Green = ON/Gray = OFF)</h2><span align=\"center\" class=\"dotready\"></span><h2>Status of the light bulb ready to turn on (Yellow = ready/Gray = not ready)</h2></div>
             client.println("<div class=\"brightness-sensor\"><h2 class=\"brightness\">brightness</h2><h2 class=\"brightness-desc\">The brightness measured by the sensor</h2></div>");
 //            client.println("<div class=\"motion-sensor\"><h2 class=\"motion\">motion</h2><h2 class=\"motion-desc\">Status of the motion (Blue = detect motion/ Gray = no movement)</h2></div>");
-            client.println("<div class=\"bbutton\"><button id = \"on-off\" type=\"button\">ON</button></div></div></body></html>");
+            
+            
+            // Display current state, and ON/OFF buttons
+
+            // If the output26State is off, it displays the ON button       
+            if (outputState=="off") {
+              client.println("<p><a href=\"/on\"><button id = \"on\" type=\"button\">ON</button></a></p>");
+            } else {
+              client.println("<p><a href=\"/off\"><button id = \"off\" type=\"button\">OFF</button></a></p>");
+            } 
+            
+//            client.println("<div class=\"bbutton\"><button id = \"on-off\" type=\"button\">ON</button></div></div></body></html>");
 
 
 
