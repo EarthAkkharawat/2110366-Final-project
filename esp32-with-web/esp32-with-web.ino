@@ -1,8 +1,3 @@
-/*********
-  Rui Santos
-  Complete project details at http://randomnerdtutorials.com
-*********/
-
 // Load Wi-Fi library
 #include <WiFi.h>
 
@@ -18,11 +13,9 @@ String header;
 
 // Auxiliar variables to store the current output state
 String outputState = "off";
-//String output27State = "off";
 
 // Assign output variables to GPIO pins
-const int output26 = 26;
-const int output27 = 27;
+const int output = 26;
 
 // Current time
 unsigned long currentTime = millis();
@@ -34,11 +27,9 @@ const long timeoutTime = 2000;
 void setup() {
   Serial.begin(115200);
   // Initialize the output variables as outputs
-  pinMode(output26, OUTPUT);
-  pinMode(output27, OUTPUT);
+  pinMode(output, OUTPUT);
   // Set outputs to LOW
-  digitalWrite(output26, LOW);
-  digitalWrite(output27, LOW);
+  digitalWrite(output, LOW);
 
   // Connect to Wi-Fi network with SSID and password
   Serial.print("Connecting to ");
@@ -89,7 +80,7 @@ void loop() {
             } else if (header.indexOf("GET /off") >= 0) {
               Serial.println("LED off");
               outputState = "off";
-              //digitalWrite(output26, LOW); send signal to STM32 to toggle LED low      
+              //digitalWrite(output, LOW); send signal to STM32 to toggle LED low      
 
             // Display the HTML web page **********************************************************************************************************************************************
             client.println("<!DOCTYPE html><html>");
@@ -119,13 +110,12 @@ void loop() {
             client.println("<ul id=\"list\"><li>You can turn on/off the light via the button located on the right.</li><li>If it's not dark yet, the lights will not turn on. Even if you pressthe button or not.</li><li>If it's not bright, you can turn off the lights.</li></ul></div>");
             client.println("<div class=\"main-func\">");
 //            client.println("<div class=\"Lightbulb\"><span align=\"center\" class=\"dot\"></span><h2>Status of the light bulb (Green = ON/Gray = OFF)</h2><span align=\"center\" class=\"dotready\"></span><h2>Status of the light bulb ready to turn on (Yellow = ready/Gray = not ready)</h2></div>
-            client.println("<div class=\"brightness-sensor\"><h2 class=\"brightness\">brightness</h2><h2 class=\"brightness-desc\">The brightness measured by the sensor</h2></div>");
+            client.println("<div class=\"brightness-sensor\"><h2 class=\"brightness\">" + ค่าเเสงที่วัดได้ + "</h2><h2 class=\"brightness-desc\">The brightness measured by the sensor</h2></div>");
 //            client.println("<div class=\"motion-sensor\"><h2 class=\"motion\">motion</h2><h2 class=\"motion-desc\">Status of the motion (Blue = detect motion/ Gray = no movement)</h2></div>");
             
             
             // Display current state, and ON/OFF buttons
-
-            // If the output26State is off, it displays the ON button       
+            // If the outputState is off, it displays the ON button       
             if (outputState=="off") {
               client.println("<p><a href=\"/on\"><button id = \"on\" type=\"button\">ON</button></a></p>");
             } else {
@@ -134,9 +124,8 @@ void loop() {
             
 //            client.println("<div class=\"bbutton\"><button id = \"on-off\" type=\"button\">ON</button></div></div></body></html>");
 
-
-
             //*********************************************************************************************************************************************
+            
             break;
           } else { // if you got a newline, then clear currentLine
             currentLine = "";
