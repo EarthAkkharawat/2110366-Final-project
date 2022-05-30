@@ -1,4 +1,5 @@
 
+#include <Arduino.h>
 #if defined(ESP32)
 #include <WiFi.h>
 #include <FirebaseESP32.h>
@@ -6,6 +7,7 @@
 #include <ESP8266WiFi.h>
 #include <FirebaseESP8266.h>
 #endif
+#include <Firebase_ESP_Client.h>
 
 // Provide the token generation process info.
 #include <addons/TokenHelper.h>
@@ -37,10 +39,10 @@ FirebaseConfig config;
 
 
 // Set web server port number to 80
-WiFiServer server(80);
+//WiFiServer server(80);
 
 // Variable to store the HTTP request
-String header;
+//String header;
 
 // Auxiliar variables to store the current output state
 String outputState = "off";
@@ -49,11 +51,20 @@ String outputState = "off";
 const int output = 26;
 
 // Current time
-unsigned long currentTime = millis();
+//unsigned long currentTime = millis();
 // Previous time
-unsigned long previousTime = 0;
+//unsigned long previousTime = 0;
 // Define timeout time in milliseconds (example: 2000ms = 2s)
-const long timeoutTime = 2000;
+//const long timeoutTime = 2000;
+
+
+unsigned long sendDataPrevMillis = 0;
+int count = 0;
+bool signupOK = false;
+
+int buttonstate;
+int turnOFF;
+float brig_val;
 
 void setup() {
   Serial.begin(115200);
@@ -75,114 +86,98 @@ void setup() {
   Serial.println("WiFi connected.");
   Serial.println("IP address: ");
   Serial.println(WiFi.localIP());
-  server.begin();
+  //  server.begin();
   Serial.println();
 
-  Serial.printf("Firebase Client v%s\n\n", FIREBASE_CLIENT_VERSION);
+  config.api_key = API_KEY;
+  config.database_url = DATABASE_URL;
 
+  /* Sign up */
+  if (Firebase.signUp(&config, &auth, "", "")) {
+    Serial.println("ok");
+    signupOK = true;
+  }
+  else {
+    Serial.printf("%s\n", config.signer.signupError.message.c_str());
+  }
+
+  config.token_status_callback = tokenStatusCallback;
 
   Firebase.begin(&config, &auth);
 
   // Comment or pass false value when WiFi reconnection will control by your code or third party library
   Firebase.reconnectWiFi(true);
 
-  Firebase.setDoubleDigits(5);
+  Firebase.setDoubleDigits(3);
 }
 
 void loop() {
-  WiFiClient client = server.available();   // Listen for incoming clients
 
-  if (client) {                             // If a new client connects,
-    currentTime = millis();
-    previousTime = currentTime;
-    Serial.println("New Client.");          // print a message out in the serial port
-    String currentLine = "";                // make a String to hold incoming data from the client
-    while (client.connected() && currentTime - previousTime <= timeoutTime) {  // loop while the client's connected
-      currentTime = millis();
-      if (client.available()) {             // if there's bytes to read from the client,
-        char c = client.read();             // read a byte, then
-        Serial.write(c);                    // print it out the serial monitor
-        header += c;
-        if (c == '\n') {                    // if the byte is a newline character
-          // if the current line is blank, you got two newline characters in a row.
-          // that's the end of the client HTTP request, so send a response:
-          if (currentLine.length() == 0) {
-            // HTTP headers always start with a response code (e.g. HTTP/1.1 200 OK)
-            // and a content-type so the client knows what's coming, then a blank line:
-            client.println("HTTP/1.1 200 OK");
-            client.println("Content-type:text/html");
-            client.println("Connection: close");
-            client.println();
-
-            // turns the GPIOs on and off
-            if (header.indexOf("GET /on") >= 0) {
-              // if (value from light sensor > xxx) {
-              Serial.println("LED on");
-              outputState = "on";
-              //digitalWrite(output26, HIGH); send signal to STM32 to toggle LED high
-            } else if (header.indexOf("GET /off") >= 0) {
-              Serial.println("LED off");
-              outputState = "off";
-              //digitalWrite(output, LOW); send signal to STM32 to toggle LED low      
-
-            // Display the HTML web page **********************************************************************************************************************************************
-            client.println("<!DOCTYPE html><html>");
-            client.println("<meta http-equiv=\"X-UA-Compatible\" content=\"IE=edge\" /> ");
-            client.println("<head><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\" /");
-            client.println("<link rel = \"icon\" href = \"image/lightbub.png\"/>");
-            client.println("<meta charset = \"UTF-8\"/> ");
-            client.println("<title>Smartest Light</title >");
-            client.println("<style>html {font-family: \"Inter\"; color: rgb(255, 255, 255); background-color: #000000; display: block; align-items: center; text-align: center;}");
-            client.println(".about {margin: auto;width: 50%;padding: 10px;}");
-            client.println(".name {text-align: center;font-size: 30px;}");
-            client.println(".about {border: 3px solid rgb(255, 113, 113);padding: 2rem;padding-top: 0.5rem; width: 40rem;}");
-            client.println("#list {font-size: 20px;text-align: left;}");
-            client.println(".dot {height: 100px;width: 100px;background-color: rgb(102, 238, 120);border-radius: 50%;display: inline-block;justify-content: center;text-align: center;align-items: center;padding: 2rem;}");
-            client.println(".dotready {height: 100px;width: 100px;background-color: rgb(255, 238, 0);border-radius: 50%;display: inline-block;justify-content: center;text-align: center;align-items: center;padding: 2rem;margin-top: 2rem;}");
-            client.println(".main-func {display: inline-block; margin-top: 4rem;align-items: center;text-align: center; justify-content: center;}");
-//            client.println(".Lightbulb {font-size: 12.5px;border: 3px solid rgb(255, 113, 113);padding: 2rem;display: inline-block;justify-content: center;width: 20rem;margin-left: 4rem;text-align: center;vertical-align: top;}");
-            client.println(".brightness-sensor {font-size: 12.5px;border: 3px solid rgb(255, 113, 113);padding: 2rem;display: inline-block;justify-content: center;width: 20rem;margin-left: 4rem;text-align: center;align-items: center;vertical-align: top;}");
-            client.println(".brightness {border: 3px solid rgb(250, 180, 51);padding: 1rem;}");
-//            client.println(".motion-sensor {font-size: 12.5px;border: 3px solid rgb(255, 113, 113);padding: 2rem;display: inline-block;justify-content: center;width: 20rem;margin-left: 4rem;text-align: center;align-items: center;vertical-align: top;}");
-            client.println(".motion {border: 3px solid rgb(250, 180, 51);padding: 1rem;}");
-            client.println(".bbutton {display: inline-block;margin-left: 4rem;vertical-align: top;}");
-            client.println("#on{cursor: pointer;border: none;font-size: 40px;color: rgb(0, 0, 0); background-color: rgb(255, 230, 2);padding: 50px 50px; }</style></head>");
-            client.println("#off{cursor: pointer;border: none;font-size: 40px;color: rgb(0, 0, 0); background-color: rgb(175, 174, 168);padding: 50px 50px; }</style></head>");
-            client.println("<body><div class=\"name\"><h1>Smartest Light</h1></div>");
-            client.println("<div class=\"about\"><h2>How to use (manual mode)</h2>");
-            client.println("<ul id=\"list\"><li>You can turn on/off the light via the button located on the right.</li><li>If it's not dark yet, the lights will not turn on. Even if you pressthe button or not.</li><li>If it's not bright, you can turn off the lights.</li></ul></div>");
-            client.println("<div class=\"main-func\">");
-//            client.println("<div class=\"Lightbulb\"><span align=\"center\" class=\"dot\"></span><h2>Status of the light bulb (Green = ON/Gray = OFF)</h2><span align=\"center\" class=\"dotready\"></span><h2>Status of the light bulb ready to turn on (Yellow = ready/Gray = not ready)</h2></div>
-            client.println("<div class=\"brightness-sensor\"><h2 class=\"brightness\">" + ค่าเเสงที่วัดได้ + "</h2><h2 class=\"brightness-desc\">The brightness measured by the sensor</h2></div>");
-//            client.println("<div class=\"motion-sensor\"><h2 class=\"motion\">motion</h2><h2 class=\"motion-desc\">Status of the motion (Blue = detect motion/ Gray = no movement)</h2></div>");
-            
-            
-            // Display current state, and ON/OFF buttons
-            // If the outputState is off, it displays the ON button       
-            if (outputState=="off") {
-              client.println("<p><a href=\"/on\"><button id = \"on\" type=\"button\">ON</button></a></p>");
-            } else {
-              client.println("<p><a href=\"/off\"><button id = \"off\" type=\"button\">OFF</button></a></p>");
-            } 
-            
-//            client.println("<div class=\"bbutton\"><button id = \"on-off\" type=\"button\">ON</button></div></div></body></html>");
-
-            //*********************************************************************************************************************************************
-            
-            break;
-          } else { // if you got a newline, then clear currentLine
-            currentLine = "";
-          }
-        } else if (c != '\r') {  // if you got anything else but a carriage return character,
-          currentLine += c;      // add it to the end of the currentLine
-        }
+  if (Firebase.ready() && signupOK && (millis() - sendDataPrevMillis > 15000 || sendDataPrevMillis == 0)) {
+    sendDataPrevMillis = millis();
+    
+    if (Firebase.RTDB.getInt(&fbdo, "/test/buttonState")) {
+      if (fbdo.dataType() == "int") {
+        buttonstate = fbdo.intData();
+        Serial.println(buttonstate);
       }
     }
-    // Clear the header variable
-    header = "";
-    // Close the connection
-    client.stop();
-    Serial.println("Client disconnected.");
-    Serial.println("");
+    else {
+      Serial.println(fbdo.errorReason());
+    }
+
+    if (Firebase.RTDB.getInt(&fbdo, "/test/turnOFF")) {
+      if (fbdo.dataType() == "int") {
+        turnOFF = fbdo.intData();
+        Serial.println(turnOFF);
+      }
+    }
+    else {
+      Serial.println(fbdo.errorReason());
+    }
+
+    //Write an Int number on the database path test/int
+    if (night && motion detected && buttonstate == 0) {
+      if (Firebase.RTDB.setInt(&fbdo, "test/buttonState", 1)) {
+        Serial.println("PASSED");
+        Serial.println("PATH: " + fbdo.dataPath());
+        Serial.println("TYPE: " + fbdo.dataType());
+      }
+      else {
+        Serial.println("FAILED");
+        Serial.println("REASON: " + fbdo.errorReason());
+      }
+    } else if (!night){
+      if (Firebase.RTDB.setInt(&fbdo, "test/buttonState", 0)) {
+        Serial.println("PASSED");
+        Serial.println("PATH: " + fbdo.dataPath());
+        Serial.println("TYPE: " + fbdo.dataType());
+      }
+      else {
+        Serial.println("FAILED");
+        Serial.println("REASON: " + fbdo.errorReason());
+      }
+    }else if (night && buttonstate == 1 && turnOFF == 1){
+      if (Firebase.RTDB.setInt(&fbdo, "test/buttonState", 0)) {
+        Serial.println("PASSED");
+        Serial.println("PATH: " + fbdo.dataPath());
+        Serial.println("TYPE: " + fbdo.dataType());
+      }
+      else {
+        Serial.println("FAILED");
+        Serial.println("REASON: " + fbdo.errorReason());
+      }
+    }
+
+    // Write an Float number on the database path test/brightness
+    if (Firebase.RTDB.setDouble(&fbdo, "test/brightness", 0.01 + random(0, 100))) {
+      Serial.println("PASSED");
+      Serial.println("PATH: " + fbdo.dataPath());
+      Serial.println("TYPE: " + fbdo.dataType());
+    }
+    else {
+      Serial.println("FAILED");
+      Serial.println("REASON: " + fbdo.errorReason());
+    }
   }
 }
