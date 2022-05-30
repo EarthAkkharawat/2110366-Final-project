@@ -30,7 +30,8 @@
       firebase.initializeApp(firebaseConfig);
       var database = firebase.database();
     </script>
-    <script src="app.js" defer></script>
+    <!-- <script src="app.js" defer></script> -->
+    <!-- <script type="module" src="app.js"></script> -->
   </head>
 
   <style>
@@ -157,7 +158,7 @@
       /* color: #000000;  */
       /* box-shadow: -6px 14px 12px 2px rgba(240, 202, 202, 0.959); */
     }
-    #off {
+    #on-off {
       cursor: pointer;
       border: none;
       font-size: 40px;
@@ -211,8 +212,10 @@
       </div> -->
 
       <div class="bbutton">
-        <button id="on" type="button">ON</button>
+        <button id="on-off" type="button">OFF</button>
       </div>
     </div>
+    
+    <script type="module" src="app.js"></script>
   </body>
 </html>
