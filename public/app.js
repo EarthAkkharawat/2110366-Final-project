@@ -19,9 +19,24 @@
 //   getDatabase,
 //   ref,
 //   set,
-// } from "https://www.gstatic.com/firebasejs/9.1.0/firebase-database.js";
+// } from "/firebase/database";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-app.js";
+import { getDatabase,ref,onValue,update,get,set } from "https://www.gstatic.com/firebasejs/9.6.11/firebase-database.js";
+var firebaseConfig = {
+  apiKey: "AIzaSyDU3ZLPqguNfSx2TBqNUsPZnsruVY_H3tQ",
+  authDomain: "smartest-light.firebaseapp.com",
+  databaseURL: "https://smartest-light-default-rtdb.firebaseio.com",
+  projectId: "smartest-light",
+  storageBucket: "smartest-light.appspot.com",
+  messagingSenderId: "863791815861",
+  appId: "1:863791815861:web:cc08cc550c2010b88772fc",
+  measurementId: "G-3WEQ651SPY",
+};
 
 var database = firebase.database();
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app);
 // const app = initializeApp(firebaseConfig);
 // const analytics = getAnalytics(app);
 
@@ -41,9 +56,9 @@ var floatReading;
 var intReading;
 
 // const db = getDatabase();
-// set(ref(db, "test/"), {
-//   buttonState: 0,
-// });
+set(ref(db, "test/"), {
+  buttonState: 0,
+});
 
 // Attach an asynchronous callback to read the data
 databaseFloat.on(
@@ -63,23 +78,23 @@ databaseFloat.on(
   }
 );
 
-databaseInt.on(
-  "value",
-  (snapshot) => {
-    intReading = snapshot.val();
-    console.log(intReading);
-    if (intReading == 1) {
-      document.getElementById("on-off").innerHTML = "ON";
-      document.getElementById("on-off").src = "image/light-bulb.png";
-    } else if (intReading == 0) {
-      document.getElementById("on-off").innerHTML = "OFF";
-      document.getElementById("on-off").src = "image/nolightbut.png";
-    }
-  },
-  (errorObject) => {
-    console.log("The read failed: " + errorObject.name);
-  }
-);
+// databaseInt.on(
+//   "value",
+//   (snapshot) => {
+//     intReading = snapshot.val();
+//     console.log(intReading);
+//     if (intReading == 1) {
+//       document.getElementById("on-off").innerHTML = "ON";
+//       document.getElementById("on-off").src = "image/light-bulb.png";
+//     } else if (intReading == 0) {
+//       document.getElementById("on-off").innerHTML = "OFF";
+//       document.getElementById("on-off").src = "image/nolightbut.png";
+//     }
+//   },
+//   (errorObject) => {
+//     console.log("The read failed: " + errorObject.name);
+//   }
+// );
 
 document.getElementById("on-off").addEventListener("click", function onClick() {
   // const db = getDatabase();
@@ -94,9 +109,9 @@ document.getElementById("on-off").addEventListener("click", function onClick() {
     check = 1;
 
     // const db = getDatabase();
-    // set(ref(db, "test/"), {
-    //   buttonState: 0,
-    // });
+    update(ref(db, "test/"), {
+      buttonState: 0,
+    });
     // console.log("test");
   } else {
     console.log("test2");
@@ -105,9 +120,9 @@ document.getElementById("on-off").addEventListener("click", function onClick() {
     check = 0;
 
     // const db = getDatabase();
-    // set(ref(db, "test/"), {
-    //   buttonState: 1,
-    // });
+    update(ref(db, "test/"), {
+      buttonState: 1,
+    });
     console.log("test");
     // document.getElementById("on-off").innerHTML = "OFF";
   }
