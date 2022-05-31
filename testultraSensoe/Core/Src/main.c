@@ -19,8 +19,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "HCSR04.h"
-
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
@@ -62,7 +60,7 @@ static void MX_TIM1_Init(void);
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 uint16_t sysTicks = 0;
-int distance = 0;
+float distance = 0.0;
 char mSG[25] = {0};
 
 // Let's write the callback function
@@ -114,8 +112,10 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+
 	distance = HCSR04_Read(0);
-	sprintf(mSG,"%d\r\n",distance);
+	sprintf(mSG,"%f\r\n",distance);
 	HAL_UART_Transmit(&huart2, mSG, sizeof(mSG), 100);
   }
   /* USER CODE END 3 */

@@ -44,10 +44,11 @@
 TIM_HandleTypeDef htim2;
 TIM_HandleTypeDef htim4;
 
+UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-
+char Rx_data[11] = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -55,9 +56,11 @@ void SystemClock_Config(void);
 static void MX_GPIO_Init(void);
 static void MX_USART2_UART_Init(void);
 static void MX_TIM2_Init(void);
+static void MX_USART1_UART_Init(void);
 static void MX_TIM4_Init(void);
 /* USER CODE BEGIN PFP */
 void usDelay(uint32_t uSec);
+void calculateDistance(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -69,6 +72,11 @@ const float speedOfSound = 0.0343/2;
 float distance;
 float distancePrev;
 char uartBuf[100];
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+  HAL_UART_Receive_IT(&huart1, (uint8_t*) Rx_data, 11);
+//  HAL_UART_Transmit(&huart2, (uint8_t*) Rx_data, sizeof(Rx_data), 1000);
+}
 /* USER CODE END 0 */
 
 /**
@@ -101,9 +109,11 @@ int main(void)
   MX_GPIO_Init();
   MX_USART2_UART_Init();
   MX_TIM2_Init();
+  MX_USART1_UART_Init();
   MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
-  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, GPIO_PIN_SET);
+  HAL_UART_Receive_IT(&huart1, (uint8_t*) Rx_data,sizeof(Rx_data));
+  HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10, GPIO_PIN_RESET);
   HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, GPIO_PIN_RESET);
   /* USER CODE END 2 */
 
@@ -114,52 +124,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  //Set TRIG to LOW for few uSec
-	  		HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_RESET);
-	  		usDelay(3);
-
-	  		//*** START Ultrasonic measure routine ***//
-	  		//1. Output 10 usec TRIG
-	  		HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_SET);
-	  		usDelay(10);
-	  		HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_RESET);
-
-	  		//2. ECHO signal pulse width
-
-	  		//Start IC timer
-	  		HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1);
-	  		//Wait for IC flag
-	  		uint32_t startTick = HAL_GetTick();
-	  		do
-	  		{
-	  			if(icFlag) break;
-	  		}while((HAL_GetTick() - startTick) < 500);  //500ms
-	  		icFlag = 0;
-	  		HAL_TIM_IC_Stop_IT(&htim2, TIM_CHANNEL_1);
-
-	  		//Calculate distance in cm
-	  		if(edge2Time > edge1Time)
-	  		{
-	  			distance = ((edge2Time - edge1Time) + 0.0f)*speedOfSound;
-	  		}
-	  		else
-	  		{
-	  			distance = 0.0f;
-	  		}
-	  		float diffDistance = distance-distancePrev;
-	  		if(diffDistance < 0){
-	  			diffDistance = diffDistance*(-1);
-	  		}
-	  		if(diffDistance > 10){
-	  			HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_10);
-	  			HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_12);
-	  		}
-	  		distancePrev = distance;
+	  	  	calculateDistance();
 	  		//Print to UART terminal for debugging
 	  		sprintf(uartBuf, "Distance (cm)  = %.1f\r\n", distance);
 	  		HAL_UART_Transmit(&huart2, (uint8_t *)uartBuf, strlen(uartBuf), 100);
 
-	  		HAL_Delay(100);
+	  		HAL_Delay(400);
   }
   /* USER CODE END 3 */
 }
@@ -312,6 +282,39 @@ static void MX_TIM4_Init(void)
 }
 
 /**
+  * @brief USART1 Initialization Function
+  * @param None
+  * @retval None
+  */
+static void MX_USART1_UART_Init(void)
+{
+
+  /* USER CODE BEGIN USART1_Init 0 */
+
+  /* USER CODE END USART1_Init 0 */
+
+  /* USER CODE BEGIN USART1_Init 1 */
+
+  /* USER CODE END USART1_Init 1 */
+  huart1.Instance = USART1;
+  huart1.Init.BaudRate = 115200;
+  huart1.Init.WordLength = UART_WORDLENGTH_8B;
+  huart1.Init.StopBits = UART_STOPBITS_1;
+  huart1.Init.Parity = UART_PARITY_NONE;
+  huart1.Init.Mode = UART_MODE_TX_RX;
+  huart1.Init.HwFlowCtl = UART_HWCONTROL_NONE;
+  huart1.Init.OverSampling = UART_OVERSAMPLING_16;
+  if (HAL_UART_Init(&huart1) != HAL_OK)
+  {
+    Error_Handler();
+  }
+  /* USER CODE BEGIN USART1_Init 2 */
+
+  /* USER CODE END USART1_Init 2 */
+
+}
+
+/**
   * @brief USART2 Initialization Function
   * @param None
   * @retval None
@@ -415,6 +418,46 @@ void HAL_TIM_IC_CaptureCallback(TIM_HandleTypeDef *htim)
 			captureIdx = 0;
 			icFlag = 1;
 		}
+}
+void calculateDistance(void){
+	//Set TRIG to LOW for few uSec
+	HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_RESET);
+	usDelay(3);
+
+    //*** START Ultrasonic measure routine ***//
+ 	//1. Output 10 usec TRIG
+	HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_SET);
+  	usDelay(10);
+ 	HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_RESET);
+
+	//2. ECHO signal pulse width
+
+	//Start IC timer
+	HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1);
+	//Wait for IC flag
+	uint32_t startTick = HAL_GetTick();
+	do
+	{
+		if(icFlag) break;
+	}while((HAL_GetTick() - startTick) < 500);  //500ms
+	icFlag = 0;
+	HAL_TIM_IC_Stop_IT(&htim2, TIM_CHANNEL_1);
+
+	//Calculate distance in cm
+	if(edge2Time > edge1Time)
+	{
+		distance = ((edge2Time - edge1Time) + 0.0f)*speedOfSound;
+	}
+	//	  		else
+	//	  		{
+	//	  			distance = 0.0f;
+	//	  		}
+	float diffDistance = distancePrev-distance;
+	if(diffDistance > 10){
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_10);
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_12);
+	}
+	distancePrev = distance;
 }
 /* USER CODE END 4 */
 
