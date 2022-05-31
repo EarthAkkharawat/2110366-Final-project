@@ -9,45 +9,43 @@
     <title>Smartest Light</title>
 
     <!-- The core Firebase JS SDK is always required and must be listed first -->
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <!-- <script src="https://www.gstatic.com/firebasejs/9.8.2/firebase-app.js"></script> -->
 
     <!-- TODO: Add SDKs for Firebase products that you want to use
         https://firebase.google.com/docs/web/setup#available-libraries -->
-    <script src="https://www.gstatic.com/firebasejs/8.8.1/firebase-database.js"></script>
-
-    <script>
-      var firebaseConfig = {
-        apiKey: "AIzaSyDU3ZLPqguNfSx2TBqNUsPZnsruVY_H3tQ",
-        authDomain: "smartest-light.firebaseapp.com",
-        databaseURL: "https://smartest-light-default-rtdb.firebaseio.com",
-        projectId: "smartest-light",
-        storageBucket: "smartest-light.appspot.com",
-        messagingSenderId: "863791815861",
-        appId: "1:863791815861:web:cc08cc550c2010b88772fc",
-        measurementId: "G-3WEQ651SPY",
-      };
-      // Initialize Firebase
-      firebase.initializeApp(firebaseConfig);
-      var database = firebase.database();
-    </script>
-    <!-- <script src="app.js" defer></script> -->
-    <!-- <script type="module" src="app.js"></script> -->
+    <!-- <script src="https://www.gstatic.com/firebasejs/9.8.2/firebase-database.js"></script> -->
+    <script src="app.js" defer></script>
   </head>
 
   <style>
     body {
       font-family: "Inter";
-      color: rgb(255, 255, 255);
-      background-color: #000000;
-      display: block;
+      color: rgb(0, 0, 0);
+      background-color: #f7ef8c;
+      /* display: block; */
       align-items: center;
       text-align: center;
+      justify-content: center;
+    }
+    .details {
+      background-color: #ffffff;
+      box-shadow: 10px 10px 10px -2px #969292;
+      border-radius: 20px;
+      padding: 10px 10px;
+      /* max-width: 50rem; */
+      min-width: fit-content;
+      max-width: fit-content;
+      margin: auto;
+      align-items: center;
+      text-align: center;
+      justify-content: center;
     }
     .about {
       margin: auto;
       width: 40rem;
       /* padding: 10px; */
       border: 3px solid rgb(255, 113, 113);
+      border-radius: 20px;
       padding: 2rem;
       padding-top: 0.5rem;
     }
@@ -110,6 +108,7 @@
     .brightness-sensor {
       font-size: 12.5px;
       border: 3px solid rgb(255, 113, 113);
+      border-radius: 20px;
       padding: 2rem;
       display: inline-block;
       justify-content: center;
@@ -120,10 +119,31 @@
       align-items: center;
       vertical-align: top;
     }
-    .brightness {
-      /* font-size: 12.5px; */
+    .time {
+      display: inline-block;
+      width: 17rem;
       border: 3px solid rgb(250, 180, 51);
       padding: 1rem;
+      text-align: left;
+    }
+    .brightness {
+      /* font-size: 12.5px; */
+      display: inline-block;
+      padding-left: 4.5rem;
+      /* text-align: left; */
+      /* align-items: left; */
+      /* border: 3px solid rgb(250, 180, 51); */
+      /* padding: 1rem; */
+    }
+    #status-icon {
+      position: absolute;
+      margin: 0;
+      padding-left: 1rem;
+      /* top: 55%; */
+      /* -ms-transform: translateY(-50%);
+      transform: translateY(-50%); */
+      display: inline-block;
+      /* align-items: right; */
     }
     /* .motion-sensor {
       font-size: 12.5px;
@@ -163,7 +183,7 @@
       border: none;
       font-size: 40px;
       color: rgb(0, 0, 0);
-      background-color: rgb(175, 174, 168);
+      background-color: rgb(255, 255, 255);
       padding: 50px 50px;
       /* color: #000000;  */
       /* box-shadow: -6px 14px 12px 2px rgba(240, 202, 202, 0.959); */
@@ -171,51 +191,60 @@
   </style>
 
   <body>
-    <div class="name">
-      <h1>Smartest Light</h1>
-    </div>
-    <div class="about">
-      <h2>How to use (manual mode)</h2>
-      <ul id="list">
-        <li>
-          You can turn on/off the light via the button located on the right.
-        </li>
-        <li>
-          If it's not dark yet, the lights will not turn on. Even if you press
-          the button or not.
-        </li>
-        <li>If it's not bright, you can turn off the lights.</li>
-      </ul>
-    </div>
-
-    <div class="main-func">
-      <!-- <div class="Lightbulb">
-        <span align="center" class="dot"></span>
-        <h2>Status of the light bulb (Green = ON/Gray = OFF)</h2>
-        <span align="center" class="dotready"></span>
-        <h2>
-          Status of the light bulb ready to turn on (Yellow = ready/Gray = not
-          ready)
-        </h2>
-      </div> -->
-
-      <div class="brightness-sensor">
-        <h2 class="brightness">brightness</h2>
-        <h2 class="brightness-desc">The brightness measured by the sensor</h2>
+    <div class="details">
+      <div class="name">
+        <h1>Smartest Light</h1>
+      </div>
+      <div class="about">
+        <h2>How to use (manual mode)</h2>
+        <ul id="list">
+          <li>
+            You can turn on/off the light via the button located on the right.
+          </li>
+          <li>
+            If it's not dark yet, the lights will not turn on. Even if you press
+            the button or not.
+          </li>
+          <li>If it's not bright, you can turn off the lights.</li>
+        </ul>
       </div>
 
-      <!-- <div class="motion-sensor">
-        <h2 class="motion">motion</h2>
-        <h2 class="motion-desc">
-          Status of the motion (Blue = detect motion/ Gray = no movement)
-        </h2>
-      </div> -->
+      <div class="main-func">
+        <!-- <div class="Lightbulb">
+          <span align="center" class="dot"></span>
+          <h2>Status of the light bulb (Green = ON/Gray = OFF)</h2>
+          <span align="center" class="dotready"></span>
+          <h2>
+            Status of the light bulb ready to turn on (Yellow = ready/Gray = not
+            ready)
+          </h2>
+        </div> -->
 
-      <div class="bbutton">
-        <button id="on-off" type="button">OFF</button>
+        <div class="brightness-sensor">
+          <div class="time">
+            <h2 class="brightness">brightness</h2>
+            <div id="status-icon">
+              <img src="image/sun.png" height="50" width="50" />
+            </div>
+          </div>
+          <h2 class="brightness-desc">The brightness measured by the sensor</h2>
+        </div>
+
+        <!-- <div class="motion-sensor">
+          <h2 class="motion">motion</h2>
+          <h2 class="motion-desc">
+            Status of the motion (Blue = detect motion/ Gray = no movement)
+          </h2>
+        </div> -->
+
+        <div class="bbutton">
+          <button id="on-off" type="button" onclick = "click()">
+            <img src="image/light-bulb.png" height="200" width="200" />
+          </button>
+        </div>
       </div>
     </div>
-    
-    <script type="module" src="app.js"></script>
+
+    <script type = "module" src="app.js"></script>
   </body>
 </html>
