@@ -48,7 +48,7 @@ UART_HandleTypeDef huart1;
 UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
-char Rx_data[11] = {0};
+char Rx_data[2] = {0};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -61,6 +61,7 @@ static void MX_TIM4_Init(void);
 /* USER CODE BEGIN PFP */
 void usDelay(uint32_t uSec);
 void calculateDistance(void);
+void checkState(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -69,13 +70,20 @@ uint8_t icFlag = 0;
 uint8_t captureIdx=0;
 uint32_t edge1Time=0, edge2Time=0;
 const float speedOfSound = 0.0343/2;
+int detect = 0;
+float diffDistance = 0.0;
 float distance;
 float distancePrev;
 char uartBuf[100];
+char state[2] = "";
+char state0[2] = "00";
+char state1[2] = "01";
+char state2[2] = "10";
+char state3[2] = "11";
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
 {
-  HAL_UART_Receive_IT(&huart1, (uint8_t*) Rx_data, 11);
-//  HAL_UART_Transmit(&huart2, (uint8_t*) Rx_data, sizeof(Rx_data), 1000);
+  HAL_UART_Receive_IT(&huart1, (uint8_t*) Rx_data, 2);
+  memcpy(state,Rx_data,2);
 }
 /* USER CODE END 0 */
 
@@ -125,11 +133,12 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 	  	  	calculateDistance();
+	  	  	checkState();
 	  		//Print to UART terminal for debugging
-	  		sprintf(uartBuf, "Distance (cm)  = %.1f\r\n", distance);
-	  		HAL_UART_Transmit(&huart2, (uint8_t *)uartBuf, strlen(uartBuf), 100);
+//	  		sprintf(uartBuf, "Distance (cm)  = %.1f\r\n", distance);
+//	  		HAL_UART_Transmit(&huart2, (uint8_t *)uartBuf, strlen(uartBuf), 100);
 
-	  		HAL_Delay(400);
+	  		HAL_Delay(200);
   }
   /* USER CODE END 3 */
 }
@@ -429,9 +438,7 @@ void calculateDistance(void){
 	HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_SET);
   	usDelay(10);
  	HAL_GPIO_WritePin(TRIG_GPIO_Port, TRIG_Pin, GPIO_PIN_RESET);
-
 	//2. ECHO signal pulse width
-
 	//Start IC timer
 	HAL_TIM_IC_Start_IT(&htim2, TIM_CHANNEL_1);
 	//Wait for IC flag
@@ -448,16 +455,41 @@ void calculateDistance(void){
 	{
 		distance = ((edge2Time - edge1Time) + 0.0f)*speedOfSound;
 	}
-	//	  		else
-	//	  		{
-	//	  			distance = 0.0f;
-	//	  		}
-	float diffDistance = distancePrev-distance;
-	if(diffDistance > 10){
-		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_10);
-		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_12);
-	}
+	diffDistance = distancePrev-distance;
 	distancePrev = distance;
+}
+void checkState(void){
+	if(strcmp(state,state0) == 0){
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10,SET);
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, SET);
+
+	}
+	else if(strcmp(state,state1) == 0){
+
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10,SET);
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12, SET);
+	}
+	else if(strcmp(state,state2)==0){
+		if(detect){
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10,RESET);
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12,RESET);
+		}
+		else{
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10,SET);
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12,SET);
+		}
+		if(diffDistance > 20){
+			detect = 1;
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10,RESET);
+			HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12,RESET);
+		}else if(diffDistance < -20){
+			detect = 0;
+		}
+	}
+	else if(strcmp(state,state3) == 0){
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_10,RESET);
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_12,RESET);
+	}
 }
 /* USER CODE END 4 */
 
