@@ -11,7 +11,7 @@ Made as part of final project in 2110366 Embedded System Lab, semester 2/2021.
 
 Link to ours website: [Smartest Light](https://smartest-light.web.app/)
 
-Link to ours documentation: [SmartestLight documentation](https://drive.google.com/file/d/1BVH6y-2NEhOG00P2hE0y63-Ot-nXCqcQ/view?usp=sharing)
+Link to ours documentation: [SmartestLight documentation](https://drive.google.com/file/d/1GZcZg0URjr6AjvTcNGHLs4zIzWiLfYLt/view?usp=sharing)
 
 
 ## System Features
